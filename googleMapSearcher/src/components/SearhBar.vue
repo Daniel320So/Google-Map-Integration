@@ -10,12 +10,12 @@ const searchHandler = async() => {
     const response = await fetch('http://localhost:8888/search/' + text.value);
     const results  = await response.json();
     items.value = results;
-    props.searchCallBack(results);
 }
 
 const selectAddress = async(place: PlaceRecord) => {
     const obj = JSON.parse(JSON.stringify(place));
     props.searchCallBack(obj);
+    items.value = [];
 }
 
 </script>
