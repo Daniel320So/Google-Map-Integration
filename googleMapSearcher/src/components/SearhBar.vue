@@ -31,7 +31,7 @@ const selectAddress = async(place: PlaceRecord) => {
     latestSearch.value = {
         name: place.name,
         timeZone: data.timeZoneName,
-        localTime: new Date(Date.now() + data.rawOffset).toTimeString()
+        localTime: new Date(Date.now() + data.rawOffset).toUTCString()
     }
 }
 
@@ -41,13 +41,14 @@ const selectAddress = async(place: PlaceRecord) => {
     <div id="search-bar">
         <input type="text" v-model="text" v-on:keyup.enter="searchHandler" placeholder="Search locations" />
         <button @click="searchHandler"> Search </button>
-    </div>
-    <div class="dropdown-content">
+        <div class="dropdown-content">
         <button v-for="item in items" @click="selectAddress(item)">
-            <p>{{ item.name }}</p>
-            <p>{{ item.formatted_address }}</p>
+            <p class="dropdown-name">{{ item.name }}</p>
+            <p class="dropdown-address">{{ item.formatted_address }}</p>
         </button>
     </div>
+    </div>
+
     <div class="latest-search" v-if="latestSearch">
         <p>Last Search: {{ latestSearch?.name }}</p>
         <p>Time Zone: {{ latestSearch?.timeZone }}</p>
@@ -57,9 +58,59 @@ const selectAddress = async(place: PlaceRecord) => {
 
 <style scoped>
 
+#search-bar {
+    position: relative;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 25px
+}
+
+#search-bar input {
+    width: 70%;
+}
+
 .dropdown-content {
+    position: absolute;
     display: flex;
     flex-flow: column nowrap;
+    width: 100%;
+    top: 50px;
+    z-index: 1;
+} 
+
+.dropdown-content button {
+    border-radius: 0;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+.dropdown-name {
+    text-align: left;
+    width: 30%;
+    font-size: 1em;
+    margin: 0;
+}
+
+.dropdown-address {
+    text-align: left;
+    width: 70%;
+    font-size: 0.8em;
+    margin: 0;
+}
+
+.latest-search {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5%;
+    font-size: 1em;
+    margin: 0;
+}
+
+.latest-search p {
+    margin: 0;
 }
 
 </style>

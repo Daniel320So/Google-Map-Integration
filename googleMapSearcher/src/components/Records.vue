@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { PlaceRecord } from './type';
 
 const props = defineProps<{ records: PlaceRecord[] }>()
@@ -27,14 +27,18 @@ const updateRecords = () => {
     records.value = props.records.slice((currentPage.value-1)*maxItemPerPage,(currentPage.value-1)*maxItemPerPage + maxItemPerPage);
 }
 
+watch(() => props.records.length, () => {
+    updateRecords()
+});
+
 </script>
 
 <template>
     <div id="records-container">
-        <div class="pagination" v-if="records && records.length > maxItemPerPage">
+        <div class="pagination" v-if="props.records && props.records.length > maxItemPerPage">
             <a href="#" v-if="currentPage !== 1" @click="prevPageHandler">&laquo;</a>
-            <a href="#" v-for=" n in Math.ceil(records.length / maxItemPerPage)" @click="updatePageHandler(n)">{{ n }}</a>
-            <a href="#" v-if="currentPage !== Math.ceil(records.length / maxItemPerPage)" @click="nextPageHandler">&raquo;</a>
+            <a href="#" v-for=" n in Math.ceil(props.records.length / maxItemPerPage)" @click="updatePageHandler(n)">{{ n }}</a>
+            <a href="#" v-if="currentPage !== Math.ceil(props.records.length / maxItemPerPage)" @click="nextPageHandler">&raquo;</a>
         </div>
         <div class="record" v-for="item in records">
             <input type="checkbox" :id=item.place_id :name=item.name :value=item>

@@ -12,10 +12,10 @@ const records = ref<PlaceRecord[]>([]);
 const center = ref({ lat: 43.651070, lng: -79.347015 });
 const apiKey = import.meta.env.VITE_GOOGLE_API;
 
-const getLocation = async() => {
+const getLocation = async () => {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async(position) => {
-      const response = await fetch(import.meta.env.VITE_SERVER_HOST + '/getLocation/' + position.coords.latitude + '/'+ position.coords.longitude);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const response = await fetch(import.meta.env.VITE_SERVER_HOST + '/getLocation/' + position.coords.latitude + '/' + position.coords.longitude);
       const place = (await response.json()).results[0];
       location.value = place.formatted_address;
       center.value = place.geometry.location;
@@ -25,9 +25,9 @@ const getLocation = async() => {
   }
 }
 
-const updateRecords = async(record: PlaceRecord) => {
+const updateRecords = async (record: PlaceRecord) => {
   // Add into records
-  records.value.push(record);
+  if (!records.value.find( r => r.place_id == record.place_id))records.value.push(record);
 }
 
 const deleteHandler = () => {
@@ -37,33 +37,49 @@ const deleteHandler = () => {
 </script>
 
 <template>
-  <p> {{location}}</p>
-  <button @click="getLocation"> Get Current Locaiton</button>
+  <div id="current-location">
+    <p v-if="location"> Current Location: {{ location }}</p>
+    <button @click="getLocation"> Get Current Locaiton</button>
+  </div>
   <SearchBar :searchCallBack="updateRecords"></SearchBar>
-  <Records :records=records></Records>
-  <button id="delete-button" @click="deleteHandler">Delete</button>
+  <div id="record-map-container">
+    <div id="record-wrapper">
+      <button id="delete-button" @click="deleteHandler">Delete</button>
+      <Records :records=records></Records>
+    </div>
 
-  <GoogleMap
-    :api-key= "apiKey"
-    style="width: 100%; height: 500px"
-    :center="center"
-    :zoom="15"
-  >
-  <MarkerCluster>
-      <Marker
-        :options="{position: m.geometry.location}"
-        v-for="(m) in records"
-      />
-    </MarkerCluster>
-  </GoogleMap>
-
-
+    <GoogleMap class="map" :api-key="apiKey" :center="center" :zoom="7">
+      <MarkerCluster>
+        <Marker :options="{ position: m.geometry.location }" v-for="(m) in records" />
+      </MarkerCluster>
+    </GoogleMap>
+  </div>
 </template>
 
 <style scoped>
+#current-location {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center; 
+    gap: 5%
+}
 
-#map {
-  height: 100%;
+#current-location p {
+    margin: 0;
+}
+
+#record-map-container {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+#record-map-container #record-wrapper {
+  width: 30%;
+}
+
+#record-map-container .map {
+  width: 70%;
+  height: 500px;
 }
 
 </style>
