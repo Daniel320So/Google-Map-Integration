@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 const port = "8888";
 require('dotenv').config()
-const apiKey = process.env.VITE_GOOGLE_API;
+const apiKey = process.env.GOOGLE_API;
 
 app.use(cors())
 
@@ -22,8 +22,18 @@ app.get("/search/:location", async (request, response) => {
       const data = await response.json();
       results = data.results.slice(0, 5);
     });
-    console.log(results);
     return response.send(results)
+})
+
+app.get("/time/:timestamp/:latitude/:longitude", async (request, response) => {
+  const url = "https://maps.googleapis.com/maps/api/timezone/json?location=" + 
+    request.params.latitude + 
+    '%2C' + 
+    request.params.longitude + 
+    '&timestamp=' + request.params.timestamp +
+    '&key=' + apiKey ;
+  const res =await fetch(url)
+  return response.send(await res.json())
 })
 
 //server listening

@@ -31,7 +31,7 @@ const updateRecords = () => {
 
 <template>
     <div id="records-container">
-        <div class="pagination" v-if="records.length > maxItemPerPage">
+        <div class="pagination" v-if="records && records.length > maxItemPerPage">
             <a href="#" v-if="currentPage !== 1" @click="prevPageHandler">&laquo;</a>
             <a href="#" v-for=" n in Math.ceil(records.length / maxItemPerPage)" @click="updatePageHandler(n)">{{ n }}</a>
             <a href="#" v-if="currentPage !== Math.ceil(records.length / maxItemPerPage)" @click="nextPageHandler">&raquo;</a>

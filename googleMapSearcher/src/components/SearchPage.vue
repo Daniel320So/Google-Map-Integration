@@ -10,11 +10,12 @@ import Records from './Records.vue';
 const location = ref("");
 const records = ref<PlaceRecord[]>([]);
 const center = ref({ lat: 43.651070, lng: -79.347015 });
+const apiKey = import.meta.env.VITE_GOOGLE_API;
 
 const getLocation = async() => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async(position) => {
-      const response = await fetch('http://localhost:8888/getLocation/' + position.coords.latitude + '/'+ position.coords.longitude);
+      const response = await fetch(import.meta.env.VITE_SERVER_HOST + '/getLocation/' + position.coords.latitude + '/'+ position.coords.longitude);
       const place = (await response.json()).results[0];
       location.value = place.formatted_address;
       center.value = place.geometry.location;
@@ -29,6 +30,10 @@ const updateRecords = async(record: PlaceRecord) => {
   records.value.push(record);
 }
 
+const deleteHandler = () => {
+  records.value = [];
+}
+
 </script>
 
 <template>
@@ -36,10 +41,10 @@ const updateRecords = async(record: PlaceRecord) => {
   <button @click="getLocation"> Get Current Locaiton</button>
   <SearchBar :searchCallBack="updateRecords"></SearchBar>
   <Records :records=records></Records>
-  <div id="map"></div>
+  <button id="delete-button" @click="deleteHandler">Delete</button>
 
   <GoogleMap
-    api-key="AIzaSyAgFPgty4KEvkL4MGJO51x45Mb8Y_jnGyw"
+    :api-key= "apiKey"
     style="width: 100%; height: 500px"
     :center="center"
     :zoom="15"
