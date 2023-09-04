@@ -2,12 +2,14 @@
 
 import { ref } from 'vue';
 import { PlaceRecord } from './type';
-import SearchBar from './SearhBar.vue';
 import { GoogleMap, Marker, MarkerCluster } from "vue3-google-map";
+
+import SearchBar from './SearhBar.vue';
+import Records from './Records.vue';
 
 const location = ref("");
 const records = ref<PlaceRecord[]>([]);
-const center = ref({ lat: 40.689247, lng: -74.044502 });
+const center = ref({ lat: 43.651070, lng: -79.347015 });
 
 const getLocation = async() => {
   if (navigator.geolocation) {
@@ -16,7 +18,6 @@ const getLocation = async() => {
       const place = (await response.json()).results[0];
       location.value = place.formatted_address;
       center.value = place.geometry.location;
-      console.log(center.value);
     });
   } else {
     console.log("Location not Supported.");
@@ -25,7 +26,6 @@ const getLocation = async() => {
 
 const updateRecords = async(record: PlaceRecord) => {
   // Add into records
-  if (records.value.length == 10 ) records.value.shift();
   records.value.push(record);
 }
 
@@ -35,6 +35,7 @@ const updateRecords = async(record: PlaceRecord) => {
   <p> {{location}}</p>
   <button @click="getLocation"> Get Current Locaiton</button>
   <SearchBar :searchCallBack="updateRecords"></SearchBar>
+  <Records :records=records></Records>
   <div id="map"></div>
 
   <GoogleMap
