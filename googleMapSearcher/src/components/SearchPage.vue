@@ -2,12 +2,13 @@
 
 import { ref } from 'vue';
 import { PlaceRecord } from './type';
-import { GoogleMap, Marker, MarkerCluster } from "vue3-google-map";
+import { GoogleMap, Marker, MarkerCluster, CustomMarker } from "vue3-google-map";
 
 import SearchBar from './SearhBar.vue';
 import Records from './Records.vue';
 
 const location = ref("");
+const currentLocation = ref();
 const records = ref<PlaceRecord[]>([]);
 const center = ref({ lat: 43.651070, lng: -79.347015 });
 const apiKey = import.meta.env.VITE_GOOGLE_API;
@@ -19,6 +20,7 @@ const getLocation = async () => {
       const place = (await response.json()).results[0];
       location.value = place.formatted_address;
       center.value = place.geometry.location;
+      currentLocation.value = place.geometry.location;
     });
   } else {
     console.log("Location not Supported.");
@@ -27,11 +29,14 @@ const getLocation = async () => {
 
 const updateRecords = async (record: PlaceRecord) => {
   // Add into records
-  if (!records.value.find( r => r.place_id == record.place_id))records.value.push(record);
+  if (!records.value.find( r => r.place_id == record.place_id)) {
+    records.value.push(record);
+    center.value = record.geometry.location;
+  } 
 }
 
-const deleteHandler = () => {
-  records.value = [];
+const deleteHandler = (newRecords: PlaceRecord[]) => {
+  records.value = newRecords;
 }
 
 </script>
@@ -44,13 +49,14 @@ const deleteHandler = () => {
   <SearchBar :searchCallBack="updateRecords"></SearchBar>
   <div id="record-map-container">
     <div id="record-wrapper">
-      <button id="delete-button" @click="deleteHandler">Delete</button>
-      <Records :records=records></Records>
+      <Records :records=records :deleteHandler="deleteHandler"></Records>
     </div>
-
-    <GoogleMap class="map" :api-key="apiKey" :center="center" :zoom="7">
+    <GoogleMap class="map" :api-key="apiKey" :center="center" :zoom="12">
       <MarkerCluster>
         <Marker :options="{ position: m.geometry.location }" v-for="(m) in records" />
+        <CustomMarker :options="{ position: currentLocation }" v-if="currentLocation">
+          <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" />
+      </CustomMarker>
       </MarkerCluster>
     </GoogleMap>
   </div>
@@ -79,7 +85,11 @@ const deleteHandler = () => {
 
 #record-map-container .map {
   width: 70%;
-  height: 500px;
+  height: 600px;
 }
 
+#record-wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+}
 </style>

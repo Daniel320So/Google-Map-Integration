@@ -31,7 +31,7 @@ const selectAddress = async(place: PlaceRecord) => {
     latestSearch.value = {
         name: place.name,
         timeZone: data.timeZoneName,
-        localTime: new Date(Date.now() + data.rawOffset).toUTCString()
+        localTime: new Date(Date.now()).toLocaleString("en-US", {timeZone: data.timeZoneId})
     }
 }
 
