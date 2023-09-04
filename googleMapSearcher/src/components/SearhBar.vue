@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps<{ apiKey: string, searchCallBack: Function }>()
+const props = defineProps<{ searchCallBack: Function }>()
 const text = ref('');
 
 const searchHandler = async() => {
+    const response = await fetch('http://localhost:8888/search/' + text.value);
+    const results  = await response.json();
+    console.log(results);
     props.searchCallBack(text.value);
 }
 

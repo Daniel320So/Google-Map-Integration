@@ -2,14 +2,12 @@
 import { ref } from 'vue'
 import SearchBar from './SearhBar.vue';
 
-defineProps<{ apiKey: string }>()
-
 const location = ref("");
 
 const getLocation = async() => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async(position) => {
-      const response = await fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + position.coords.latitude+ ','+ position.coords.longitude + '&key='+ apiKey);
+      const response = await fetch('http://localhost:8888/getLocation/' + position.coords.latitude + '/'+ position.coords.longitude);
       location.value = (await response.json()).results[0].formatted_address;
     });
   } else {
@@ -26,7 +24,7 @@ const updateRecords = async(keyword: string) => {
 <template>
   <p> {{location}}</p>
   <button @click="getLocation"> Get Current Locaiton</button>
-  <SearchBar :apiKey="$props.apiKey"  :searchCallBack="updateRecords"></SearchBar>
+  <SearchBar :searchCallBack="updateRecords"></SearchBar>
 </template>
 
 <style scoped>
