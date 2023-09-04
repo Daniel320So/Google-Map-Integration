@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { PlaceRecord } from './type';
 import SearchBar from './SearhBar.vue';
 
 const location = ref("");
@@ -15,8 +16,8 @@ const getLocation = async() => {
   }
 }
 
-const updateRecords = async(keyword: string) => {
-  console.log(keyword);
+const updateRecords = async(record: PlaceRecord) => {
+  console.log(record);
 }
 
 </script>
